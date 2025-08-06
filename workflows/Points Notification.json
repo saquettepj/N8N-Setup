@@ -1,0 +1,376 @@
+{
+  "name": "Points Notifying",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        688,
+        752
+      ],
+      "id": "76fe039b-3f4b-4a39-b7ac-caf28f91d0e7",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "content": "## Leitor de pontos\n\n",
+        "height": 736,
+        "width": 1936,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        624,
+        544
+      ],
+      "id": "0fba39d8-5f1f-4fc9-891f-964ca905efc3",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1104,
+        752
+      ],
+      "id": "4ec5f1fd-aad7-420f-a80f-60f73b389c7e",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "cards",
+              "cssSelector": ".css-522a3h",
+              "returnValue": "html",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {
+          "cleanUpText": false
+        }
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        1280,
+        752
+      ],
+      "id": "41a8d949-2ed1-4d20-bc57-110651d37083",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "task": "NjlzdUtTWTVUbWxnMHhKUQ",
+        "returnAll": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleTasks",
+      "typeVersion": 1,
+      "position": [
+        960,
+        1008
+      ],
+      "id": "d95ae681-3cda-480e-a21d-915ac9a8e928",
+      "name": "Get many tasks",
+      "credentials": {
+        "googleTasksOAuth2Api": {
+          "id": "6XcKBJuHR6kX48gr",
+          "name": "Google Tasks account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1792,
+        864
+      ],
+      "id": "74d96dd3-b1f3-486a-a224-1fafc0949a6a",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Você é um assistente de compras inteligente. Com base na lista de itens desejados e na lista de compras disponíveis hoje, sua tarefa é selecionar somente os produtos que estão na lista de itens desejados ou que tenham correspondência clara com os nomes desses itens.\n\nRegras importantes:\n\nSempre informe a Url e lista de desejos no início.\n\nNão inclua produtos que não estejam claramente relacionados com os itens desejados.\n\nA resposta será enviada por e-mail, então escreva de forma bem formatada, clara e profissional.\n\nA saída deve conter apenas os produtos sugeridos conforme as regras acima.\n\nSua tarefa:\n\nLeia os dados a seguir.\n\nFiltre os produtos que fazem parte dos itens desejados.\n\nGere uma seção formatada com o título: Sugestões de Compra, contendo os itens compatíveis, com a seguinte estrutura:\n\nSugestões de Compra:\n\nNome do Produto\n\nPreço: R$ [valor]\n\nPontos ganhos: [quantidade de pontos]\n\nPontos por real: [valor]\n\nDescrição: [breve descrição útil sobre o produto]\n\n[Próximo produto]\n...\n\nSe nenhum item da lista de compras corresponder aos itens desejados, escreva apenas:\n\nNenhum dos itens disponíveis hoje corresponde aos itens desejados.\n\nDados para análise:\n\n{{ $json.texto }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        880
+      ],
+      "id": "d959c79a-5549-42c6-9c25-8388dbc58749",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "nRORDkt1uLcqta5X",
+          "name": "Google Gemini(PaLM) API My GC"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "thigo.saquette@gmail.com",
+        "subject": "Produtos de interesse (Livelo)",
+        "emailType": "text",
+        "message": "={{ $json.content.parts[0].text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2400,
+        880
+      ],
+      "id": "42dbf5d1-561c-4407-b238-be5bb31c84a5",
+      "name": "Send a message",
+      "webhookId": "d4163e7b-775a-44a8-b9fc-f1e5d1e62f0a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "EDJMHPasZoIXTzaU",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {url: \"https://www.livelo.com.br/shopping/colecoes/aproveite-as-melhores-ofertas?hitsPerPage=60&sorter=catalog_app_accrual_parity_desc\"};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        880
+      ],
+      "id": "68e4d153-48cf-499a-be20-afbdca4890bb",
+      "name": "URL Livelo"
+    },
+    {
+      "parameters": {
+        "jsCode": "const cards = $input.first().json.cards || [];\n\nconst decodeHtml = (text) =>\n  text\n    .replace(/&nbsp;/g, ' ')\n    .replace(/&amp;/g, '&')\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>')\n    .replace(/&quot;/g, '\"')\n    .replace(/&#39;/g, \"'\");\n\nconst extractRawHtmlByTestId = (html, key) => {\n  const regex = new RegExp(\n    `<div[^>]+data-testid=[\"']?${key}[\"']?[^>]*>([\\\\s\\\\S]*?)<\\\\/div>`,\n    'i'\n  );\n  const match = html.match(regex);\n  return match ? decodeHtml(match[1]) : null;\n};\n\nconst extractCleanText = (html, key) => {\n  const raw = extractRawHtmlByTestId(html, key);\n  return raw ? raw.replace(/<[^>]+>/g, '').trim() : null;\n};\n\nconst parseNumber = (text) => {\n  if (!text) return null;\n  const clean = text.replace(/[^\\d,]/g, '').replace(/\\./g, '').replace(',', '.');\n  const num = parseFloat(clean);\n  return isNaN(num) ? null : num;\n};\n\nconst extractPointsByStrongTags = (html) => {\n  if (!html) return [null, null];\n\n  const matches = [...html.matchAll(/<strong>(.*?)<\\/strong>/gi)];\n  const first = matches[0]?.[1]?.trim() || null;\n  const second = matches[1]?.[1]?.trim() || null;\n\n  const pointsEarned = parseNumber(first);\n  const pointsPerReal = parseNumber(second);\n\n  return [pointsEarned, pointsPerReal];\n};\n\n// Mapeia os cards normalmente\nconst compras = cards.map((html, i) => {\n  const accrualHtml = extractRawHtmlByTestId(html, 'ProductCard_AccrualInfos_DefaultAccrualText');\n  const [pointsEarned, pointsPerReal] = extractPointsByStrongTags(accrualHtml);\n\n  return {\n    index: i + 1,\n    title: extractCleanText(html, 'ProductCard_ProductTitle'),\n    description: extractCleanText(html, 'Text_Typography'),\n    clubPoints: parseNumber(extractCleanText(html, 'ProductCard_ProductPricingPts_ClubSalePrice')),\n    defaultPoints: parseNumber(extractCleanText(html, 'ProductCard_ProductPricingPts_DefaultSalePrice')),\n    brlPrice: parseNumber(extractCleanText(html, 'ProductCard_ProductPricingBrl_SalePrice')),\n    pointsEarned,\n    pointsPerReal,\n  };\n});\n\n// Retorna um único item com a estrutura desejada\nreturn [\n  {\n    json: {\n      comprasDeHoje: compras\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1456,
+        752
+      ],
+      "id": "4db9a814-a8b5-4f43-b650-1d52b6632cc6",
+      "name": "Extrai Produtos",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const tasks = $input.all().map(item => item.json);\n\n// Extrai apenas os títulos e formata\nconst itemsDesejados = tasks.map(task => ({\n  itemDesejado: task.title\n}));\n\nreturn [\n  {\n    json: {\n      itemsDesejados\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1296,
+        1008
+      ],
+      "id": "7ec13cc8-4839-45d3-a3e3-abe78be671cd",
+      "name": "Extrai itens"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allInputs = $input.all();\n\n// Primeiro item tem `comprasDeHoje`\nconst comprasDeHoje = allInputs[0].json.comprasDeHoje;\n\n// Segundo item tem `url`\nconst url = allInputs[1].json.url;\n\n// Segundo item tem `itemsDesejados`\nconst itemsDesejados = allInputs[2].json.itemsDesejados;\n\nconst formatItemsDesejados = (items = []) => {\n  return items.map((item, i) => `  ${i + 1}. ${item.itemDesejado}`).join('\\n');\n};\n\nconst formatComprasDeHoje = (compras = []) => {\n  return compras.map((item, i) => {\n    return `  ${i + 1}. ${item.title}\n     - Descrição: ${item.description}\n     - Preço (BRL): R$ ${item.brlPrice}\n     - Pontos Club: ${item.clubPoints}\n     - Pontos Cheios: ${item.defaultPoints}\n     - Pontos ganhos: ${item.pointsEarned}\n     - Pontos por real: ${item.pointsPerReal}`;\n  }).join('\\n\\n');\n};\n\nconst texto = `Url:\\n${url}\\n\\nItens desejados:\\n${formatItemsDesejados(itemsDesejados)}\\n\\nCompras de hoje:\\n${formatComprasDeHoje(comprasDeHoje)}`;\n\nreturn [\n  {\n    json: {\n      texto\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1936,
+        880
+      ],
+      "id": "1b158362-d12d-40ad-ac3b-33ec36a6bcba",
+      "name": "JSON -> Texto"
+    },
+    {
+      "parameters": {
+        "jsCode": "const compras = $input.first().json.comprasDeHoje;\n\nconst filtrado = compras.filter(item => item.pointsPerReal >= 5);\n\nreturn [\n  {\n    json: {\n      comprasDeHoje: filtrado\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1616,
+        752
+      ],
+      "id": "9e4e098f-4742-4e62-b0c7-44c2e73678bf",
+      "name": "Filter 5 Points"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get many tasks",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "URL Livelo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Extrai Produtos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many tasks": {
+      "main": [
+        [
+          {
+            "node": "Extrai itens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "JSON -> Texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "URL Livelo": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Extrai Produtos": {
+      "main": [
+        [
+          {
+            "node": "Filter 5 Points",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrai itens": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "JSON -> Texto": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter 5 Points": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "93e7b9c8-9b05-4ab3-823c-9cda4d3542f5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e1b06670a77c2d40dfca10903b68fc4625c174c2ff79d1239fd73e93d75b0317"
+  },
+  "id": "8ygUL7BgCvZC04pb",
+  "tags": []
+}
