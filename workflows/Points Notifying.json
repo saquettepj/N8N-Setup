@@ -2,21 +2,10 @@
   "name": "Points Notifying",
   "nodes": [
     {
-      "parameters": {},
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1,
-      "position": [
-        688,
-        752
-      ],
-      "id": "76fe039b-3f4b-4a39-b7ac-caf28f91d0e7",
-      "name": "When clicking ‘Execute workflow’"
-    },
-    {
       "parameters": {
         "content": "## Leitor de pontos\n\n",
-        "height": 736,
-        "width": 1936,
+        "height": 704,
+        "width": 2112,
         "color": 2
       },
       "type": "n8n-nodes-base.stickyNote",
@@ -71,7 +60,7 @@
     {
       "parameters": {
         "operation": "getAll",
-        "task": "NjlzdUtTWTVUbWxnMHhKUQ",
+        "task": "LXU5X2JIZ0hmOXhOV29PMw",
         "returnAll": true,
         "additionalFields": {}
       },
@@ -148,8 +137,8 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        2400,
-        880
+        2544,
+        1024
       ],
       "id": "42dbf5d1-561c-4407-b238-be5bb31c84a5",
       "name": "Send a message",
@@ -226,26 +215,63 @@
       ],
       "id": "9e4e098f-4742-4e62-b0c7-44c2e73678bf",
       "name": "Filter 5 Points"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        944
+      ],
+      "id": "0ac91302-9c6d-4ac9-b0cc-b9118aa928db",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fc695deb-5332-499c-8151-a365c21cab03",
+              "leftValue": "={{ $json.content.parts[0].text }}",
+              "rightValue": "Nenhum dos itens disponíveis hoje corresponde aos itens desejados",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2400,
+        880
+      ],
+      "id": "e3405925-9a1c-4ac5-b838-c5d29f6d4a0c",
+      "name": "If"
     }
   ],
   "pinData": {},
   "connections": {
-    "When clicking ‘Execute workflow’": {
-      "main": [
-        [
-          {
-            "node": "Get many tasks",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "URL Livelo",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "HTTP Request": {
       "main": [
         [
@@ -294,7 +320,7 @@
       "main": [
         [
           {
-            "node": "Send a message",
+            "node": "If",
             "type": "main",
             "index": 0
           }
@@ -360,13 +386,41 @@
           }
         ]
       ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "URL Livelo",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get many tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "93e7b9c8-9b05-4ab3-823c-9cda4d3542f5",
+  "versionId": "0f162176-00c5-4f24-b8b6-e75059e8fdf7",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "e1b06670a77c2d40dfca10903b68fc4625c174c2ff79d1239fd73e93d75b0317"
